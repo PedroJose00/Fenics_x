@@ -783,14 +783,15 @@ escalar_fb= 1       # COnstante balance focal para osteoblastos
 # -------------------------------------------------------------------------------------
 # Registro de datos en el tiempo para mostrar resultados
 # ------------------------------------------------------------------------------------
-vector_data_dia = [None]*1000
-escalar_contador_total_dias= 0
-promedios_damage = [None]*1000
-promedios_densidad = [None]*1000
-promedios_modulo_elasticidad = [None]*1000
-promedios_BVTV=[None]*1000
-promedios_rho_cortical_gr_cm_3=[None]*1000
-escalar_energy=[None]*1000
+escalar_contador_total_dias = 0
+promedios_damage = np.zeros(10000)
+promedios_densidad = np.zeros(10000)
+promedios_modulo_elasticidad = np.zeros(10000)
+promedios_BVTV = np.zeros(10000)
+promedios_rho_cortical_gr_cm_3 = np.zeros(10000)
+escalar_energy = np.zeros(10000)
+
+
 str_archivo_resultados = './21_04_24/rst_densidad_daño_elasticidad.csv'
 
 
@@ -897,7 +898,6 @@ for dmes in range(1, 7):
     # --------------------------------------------------------------------------------------------
     # aca inicia fase 1 
     # --------------------------------------------------------------------------------------------
-    escalar_contador_total_dias += 0
 
     for dday in range(1, 24):  # Ciclo externo con dtime va de 1 a 24
        
@@ -2732,7 +2732,8 @@ for dmes in range(1, 7):
     # Para fase #7: Esta fase dura 100 días + TR + TI + TF
     for dday in range(1, 24):  # Ciclo externo con dtime va de 1 a 96
         t_prima_100_TR_TI_TF = 24 - dday
-    
+        escalar_contador_total_dias += 1
+
         for cycle in range(1000, 10001, 1000):  # Ciclo interno va de 1000 en 1000 hasta 10000
             tmp_day = dday
             tmp_cycle = cycle / 1000
@@ -3070,13 +3071,14 @@ tmp_lenght = escalar_contador_total_dias
 print(f"07-longitud del CSV-->>>>:{tmp_lenght}")
 # Crear un DataFrame usando los arrays almacenados
 data = pd.DataFrame({
-    'Día': np.arange(1, escalar_contador_total_dias + 1),
-    'Damage Promedio': promedios_damage,
-    'Densidad Promedio': promedios_rho_cortical_gr_cm_3,
-    'Fracción de Volumen Promedio': promedios_BVTV,
-    'Energia de Deformacion':escalar_energy,
-    'Modulo de elasticidad promedio':promedios_modulo_elasticidad
+    'Día': np.arange(1, tmp_lenght + 1),
+    'Damage Promedio': promedios_damage[:tmp_lenght],
+    'Densidad Promedio': promedios_rho_cortical_gr_cm_3[:tmp_lenght],
+    'Fracción de Volumen Promedio': promedios_BVTV[:tmp_lenght],
+    'Energia de Deformacion': escalar_energy[:tmp_lenght],
+    'Modulo de elasticidad promedio': promedios_modulo_elasticidad[:tmp_lenght]
 })
+
 
 # Exportar el DataFrame a CSV
 data.to_csv('./04_05_24/resultados_promedio_final.csv', index=False)
